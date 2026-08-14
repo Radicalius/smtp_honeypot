@@ -1,6 +1,9 @@
 package protocol
 
-import "regexp"
+import (
+	"fmt"
+	"regexp"
+)
 
 var ehloRegex = regexp.MustCompile("EHLO (.*)")
 
@@ -13,7 +16,12 @@ func (s SmtpEhloMessage) Matches(arg string) bool {
 
 func (s SmtpEhloMessage) Handle(transaction *SmtpTransaction, arg string) string {
 	matches := ehloRegex.FindStringSubmatch(arg)
-	transaction.Hostname = matches[1]
+	if len(matches) >= 2 {
+		transaction.Hostname = matches[1]
+	} else {
+		fmt.Println("warning: ehlo missing submatch")
+	}
+
 	transaction.ExtendedProtocol = true
 	return `250-{server_name}
 250-PIPELINING

@@ -4,24 +4,38 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
 	"smtp_honeypot/protocol"
 	"strings"
+	"time"
 )
 
 var tlsConfig *tls.Config
+var handlerSemaphor = make(chan int, 10)
 
 func HandleConnection(conn net.Conn) {
+	conn.SetDeadline(time.Now().Add(30 * time.Second))
+
+	defer func() {
+		<-handlerSemaphor
+	}()
+
 	var trans protocol.SmtpTransaction
 
 	conn.Write([]byte("220 mail.example.com ESMTP\r\n"))
 
 	for {
 		buf := make([]byte, 1024)
+		conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 		n, err := conn.Read(buf)
 		if err != nil {
+			if os.IsTimeout(err) || err == io.EOF {
+				return
+			}
+
 			fmt.Printf("error reading message from client: %s\n", err.Error())
 			return
 		}
@@ -92,6 +106,11 @@ func main() {
 			continue
 		}
 
-		go HandleConnection(conn)
+		select {
+		case handlerSemaphor <- 0:
+			go HandleConnection(conn)
+		default:
+			conn.Close()
+		}
 	}
 }

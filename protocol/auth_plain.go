@@ -3,6 +3,7 @@ package protocol
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"regexp"
 )
 
@@ -17,16 +18,20 @@ func (s SmtpAuthPlainMessage) Matches(arg string) bool {
 
 func (s SmtpAuthPlainMessage) Handle(transaction *SmtpTransaction, arg string) string {
 	matches := authPlainRegex.FindStringSubmatch(arg)
-	transaction.B64PlainAuth = matches[1]
+	if len(matches) >= 2 {
+		transaction.B64PlainAuth = matches[1]
 
-	decoded, err := base64.StdEncoding.DecodeString(matches[1])
-	if err == nil {
-		parts := bytes.Split(decoded, []byte{0})
-		if len(parts) == 3 {
-			transaction.AuthorizationId = string(parts[0])
-			transaction.Username = string(parts[1])
-			transaction.Password = string(parts[2])
+		decoded, err := base64.StdEncoding.DecodeString(matches[1])
+		if err == nil {
+			parts := bytes.Split(decoded, []byte{0})
+			if len(parts) == 3 {
+				transaction.AuthorizationId = string(parts[0])
+				transaction.Username = string(parts[1])
+				transaction.Password = string(parts[2])
+			}
 		}
+	} else {
+		fmt.Println("warning: plain auth matched but didn't have submatch")
 	}
 
 	return "235 2.7.0 Authentication successful"
