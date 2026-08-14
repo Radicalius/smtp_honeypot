@@ -1,0 +1,40 @@
+swaks --server localhost --port 2525 \
+  --to recipient@test.com --from recipient@test.com \
+  --h-Date: "Thu, 01 Jan 2020 00:00:00 +0000" \
+  --h-Subject: "test" \
+  --h-Message-Id: "<fixed@test>" \
+  --ehlo fixed.host
+
+=== Trying localhost:2525...
+=== Connected to localhost.
+<-  220 mail.example.com ESMTP
+ -> EHLO fixed.host
+<-  250-{server_name}
+<-  250-PIPELINING
+<-  250-SIZE 10240000
+<-  250-VRFY
+<-  250-ETRN
+<-  250-STARTTLS
+<-  250-AUTH LOGIN PLAIN
+<-  250 8BITMIME
+ -> MAIL FROM:<recipient@test.com>
+<-  250 2.1.0 OK
+ -> RCPT TO:<recipient@test.com>
+<-  250 2.1.5 OK
+ -> DATA
+<-  354 3.0.0 Start mail input
+ -> Date: Thu, 01 Jan 2020 00:00:00 +0000
+ -> To: recipient@test.com
+ -> From: recipient@test.com
+ -> Subject: test
+ -> Message-Id: <fixed@test>
+ -> X-Mailer: swaks v20240103.0 jetmore.org/john/code/swaks/
+ -> 
+ -> This is a test mailing
+ -> 
+ -> 
+ -> .
+<-  250 2.0.0 OK
+ -> QUIT
+<-  221 2.0.0 Bye
+=== Connection closed with remote host.
