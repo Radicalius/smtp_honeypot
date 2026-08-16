@@ -1,12 +1,24 @@
+import argparse
 import os
 import sys
 import difflib
 
+parser = argparse.ArgumentParser(description="Test runner for smtp honeypot")
+parser.add_argument(
+    "-f", "--filter", type=str, default="", help="Only run matching tests"
+)
+args = parser.parse_args()
+
 ran = 0
 passed = 0
+skipped = 0
 
 for file in os.listdir("."):
   if file.endswith(".test"):
+    if args.filter != "" and args.filter not in file:
+      skipped += 1
+      continue
+
     cont = open(file).read()
     parts = cont.split("\n\n")
     assert len(parts) >= 2
@@ -27,7 +39,7 @@ for file in os.listdir("."):
     else:
       passed += 1
 
-print(f"Summary: Tests Passed: {passed}; Tests Run: {ran}")
+print(f"Summary: Tests Passed: {passed}; Tests Run: {ran}; Skipped {skipped}")
 
 if passed < ran:
   sys.exit(1)

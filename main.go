@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/tls"
 	"fmt"
@@ -20,6 +21,7 @@ func HandleConnection(conn net.Conn) {
 	conn.SetDeadline(time.Now().Add(30 * time.Second))
 
 	defer func() {
+		conn.Close()
 		<-handlerSemaphor
 	}()
 
@@ -27,10 +29,11 @@ func HandleConnection(conn net.Conn) {
 
 	conn.Write([]byte("220 mail.example.com ESMTP\r\n"))
 
+	reader := bufio.NewReader(conn)
+
 	for {
-		buf := make([]byte, 1024)
 		conn.SetReadDeadline(time.Now().Add(5 * time.Second))
-		n, err := conn.Read(buf)
+		buf, err := reader.ReadBytes('\n')
 		if err != nil {
 			if os.IsTimeout(err) || err == io.EOF {
 				return
@@ -40,8 +43,8 @@ func HandleConnection(conn net.Conn) {
 			return
 		}
 
-		command := bytes.TrimSuffix(buf[:n], []byte("\r\n"))
-		if string(command) == "QUIT" {
+		command := bytes.TrimRight(buf, "\r\n")
+		if strings.Contains(string(command), "QUIT") {
 			conn.Write([]byte("221 2.0.0 Bye\r\n"))
 			conn.Close()
 
@@ -50,7 +53,7 @@ func HandleConnection(conn net.Conn) {
 			return
 		}
 
-		if string(command) == "STARTTLS" {
+		if strings.Contains(string(command), "STARTTLS") {
 			conn.Write([]byte("220 2.0.0 Ready to start TLS\r\n"))
 
 			tlsConn := tls.Server(conn, tlsConfig)
@@ -61,12 +64,16 @@ func HandleConnection(conn net.Conn) {
 			}
 
 			conn = tlsConn
+			reader = bufio.NewReader(conn)
 			continue
 		}
 
 		resp := protocol.Handle(&trans, command)
+		fmt.Printf("command: %q; resp: %q\n", command, resp)
 
-		conn.Write([]byte(resp + "\r\n"))
+		if resp != "" {
+			conn.Write([]byte(resp + "\r\n"))
+		}
 	}
 }
 

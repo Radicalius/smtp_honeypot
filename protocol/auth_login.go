@@ -5,12 +5,12 @@ import "encoding/base64"
 type SmtpAuthLoginMessage struct {
 }
 
-func (s SmtpAuthLoginMessage) Matches(arg string) bool {
-	return arg == "AUTH LOGIN"
+func (s SmtpAuthLoginMessage) Matches(arg []byte) bool {
+	return string(arg) == "AUTH LOGIN"
 }
 
-func (s SmtpAuthLoginMessage) Handle(transaction *SmtpTransaction, arg string) string {
-	if arg == "AUTH LOGIN" {
+func (s SmtpAuthLoginMessage) Handle(transaction *SmtpTransaction, arg []byte) string {
+	if string(arg) == "AUTH LOGIN" {
 		transaction.Username = ""
 		transaction.Password = ""
 		transaction.Deferred = s
@@ -18,8 +18,8 @@ func (s SmtpAuthLoginMessage) Handle(transaction *SmtpTransaction, arg string) s
 	}
 
 	if transaction.Username == "" {
-		transaction.B64Username = arg
-		decoded, err := base64.StdEncoding.DecodeString(arg)
+		transaction.B64Username = string(arg)
+		decoded, err := base64.StdEncoding.DecodeString(string(arg))
 		if err == nil {
 			transaction.Username = string(decoded)
 		}
@@ -27,8 +27,8 @@ func (s SmtpAuthLoginMessage) Handle(transaction *SmtpTransaction, arg string) s
 		return "334 UGFzc3dvcmQ6"
 	}
 
-	transaction.B64Password = arg
-	decoded, err := base64.StdEncoding.DecodeString(arg)
+	transaction.B64Password = string(arg)
+	decoded, err := base64.StdEncoding.DecodeString(string(arg))
 	if err == nil {
 		transaction.Password = string(decoded)
 	}

@@ -10,14 +10,14 @@ var ehloRegex = regexp.MustCompile("EHLO (.*)")
 type SmtpEhloMessage struct {
 }
 
-func (s SmtpEhloMessage) Matches(arg string) bool {
-	return ehloRegex.MatchString(arg)
+func (s SmtpEhloMessage) Matches(arg []byte) bool {
+	return ehloRegex.Match(arg)
 }
 
-func (s SmtpEhloMessage) Handle(transaction *SmtpTransaction, arg string) string {
-	matches := ehloRegex.FindStringSubmatch(arg)
+func (s SmtpEhloMessage) Handle(transaction *SmtpTransaction, arg []byte) string {
+	matches := ehloRegex.FindSubmatch(arg)
 	if len(matches) >= 2 {
-		transaction.Hostname = matches[1]
+		transaction.Hostname = string(matches[1])
 	} else {
 		fmt.Println("warning: ehlo missing submatch")
 	}
