@@ -1,0 +1,13 @@
+echo -e "EHLO test\r\nVRFY test@test.com\r\nQUIT\r\n" | nc localhost 2525
+
+220 mail.example.com ESMTP
+250-{server_name}
+250-PIPELINING
+250-SIZE 10240000
+250-VRFY
+250-ETRN
+250-STARTTLS
+250-AUTH LOGIN PLAIN
+250 8BITMIME
+250 <test@test.com>
+221 2.0.0 Bye
