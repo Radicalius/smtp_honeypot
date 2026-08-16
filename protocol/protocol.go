@@ -30,6 +30,7 @@ var smtpMessages []SmtpMessage = []SmtpMessage{
 	SmtpAuthLoginMessage{},
 	SmtpAuthPlainMessage{},
 	SmtpVrfyMessage{},
+	SmtpEtrnMessage{},
 }
 
 func Handle(transaction *SmtpTransaction, body []byte) string {
