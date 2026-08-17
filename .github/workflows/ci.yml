@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Build
+        run: go build
+
+      - name: Generate self-signed TLS cert
+        run: |
+          openssl req -x509 -newkey rsa:2048 -keyout server.key -out server.crt \
+            -days 1 -nodes -subj "/CN=localhost"
+
+      - name: Install swaks
+        run: sudo apt-get install -y swaks
+
+      - name: Start server
+        run: ./smtp_honeypot &
+        env:
+          SMTP_PORT: "2525"
+
+      - name: Wait for server
+        run: |
+          for i in $(seq 1 10); do
+            nc -z localhost 2525 && exit 0
+            sleep 0.5
+          done
+          echo "Server failed to start"
+          exit 1
+
+      - name: Run tests
+        run: cd tests && python3 runner.py

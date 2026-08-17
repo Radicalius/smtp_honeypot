@@ -29,8 +29,11 @@ for file in os.listdir("."):
     out = os.popen(cmd).read()
     ran += 1
 
+    res_lines = [i for i in res.splitlines() if not i.startswith("===")]
+    out_lines = [i for i in out.splitlines() if not i.startswith("===")]
+
     diff = "\n".join(difflib.unified_diff(
-      res.splitlines(), out.splitlines(),
+      res_lines, out_lines,
       fromfile="expected", tofile="got", lineterm=""
     ))
 

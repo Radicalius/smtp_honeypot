@@ -7,6 +7,9 @@ install: build upload cert service
 build:
 	go build
 
+test: build
+	cd tests && python3 runner.py
+
 upload:
 	scp -i smtp_honeypot.pem smtp_honeypot "ubuntu@$(SERVER_IP):~/"
 	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo mv smtp_honeypot /usr/local/bin
