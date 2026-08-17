@@ -2,3 +2,4 @@ smtp_honeypot
 *.key
 *.crt
 *.pem
+data/

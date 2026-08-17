@@ -17,17 +17,32 @@ import (
 var tlsConfig *tls.Config
 var handlerSemaphor = make(chan int, 10)
 
+func _sendMessageWithLog(conn net.Conn, logger *SessionLogger, data []byte) {
+	conn.Write(data)
+	err := logger.RecordMessage(MessageDirection(MESSAGE_DIRECTION_SERVER_TO_CLIENT), data)
+	if err != nil {
+		fmt.Printf("error recording log: %s\n", err.Error())
+	}
+}
+
 func HandleConnection(conn net.Conn) {
 	conn.SetDeadline(time.Now().Add(30 * time.Second))
 
+	logger, err := NewSessionLogger()
+	if err != nil {
+		fmt.Printf("warning: session logging failed to initialize: %s\n", err.Error())
+		return
+	}
+
 	defer func() {
 		conn.Close()
+		logger.Close()
 		<-handlerSemaphor
 	}()
 
 	var trans protocol.SmtpTransaction
 
-	conn.Write([]byte("220 mail.example.com ESMTP\r\n"))
+	_sendMessageWithLog(conn, logger, []byte("220 mail.example.com ESMTP\r\n"))
 
 	reader := bufio.NewReader(conn)
 
@@ -44,8 +59,10 @@ func HandleConnection(conn net.Conn) {
 		}
 
 		command := bytes.TrimRight(buf, "\r\n")
+		logger.RecordMessage(MessageDirection(MESSAGE_DIRECTION_CLIENT_TO_SERVER), buf)
+
 		if strings.Contains(string(command), "QUIT") {
-			conn.Write([]byte("221 2.0.0 Bye\r\n"))
+			_sendMessageWithLog(conn, logger, []byte("221 2.0.0 Bye\r\n"))
 			conn.Close()
 
 			fmt.Printf("%v\n", trans)
@@ -54,7 +71,7 @@ func HandleConnection(conn net.Conn) {
 		}
 
 		if strings.Contains(string(command), "STARTTLS") {
-			conn.Write([]byte("220 2.0.0 Ready to start TLS\r\n"))
+			_sendMessageWithLog(conn, logger, []byte("220 2.0.0 Ready to start TLS\r\n"))
 
 			tlsConn := tls.Server(conn, tlsConfig)
 
@@ -69,10 +86,9 @@ func HandleConnection(conn net.Conn) {
 		}
 
 		resp := protocol.Handle(&trans, command)
-		fmt.Printf("command: %q; resp: %q\n", command, resp)
 
 		if resp != "" {
-			conn.Write([]byte(resp + "\r\n"))
+			_sendMessageWithLog(conn, logger, []byte(resp+"\r\n"))
 		}
 	}
 }
