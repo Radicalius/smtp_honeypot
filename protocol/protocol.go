@@ -1,24 +1,62 @@
 package protocol
 
+type SmtpAuthentication struct {
+	Type            string `json:"type"`
+	B64PlainAuth    string `json:"-"`
+	AuthorizationId string `json:"authorizationId"`
+	Username        string `json:"username"`
+	B64Username     string `json:"-"`
+	Password        string `json:"password"`
+	B64Password     string `json:"-"`
+}
+
+const (
+	SMTP_TRANSACTION_STATUS_IN_PROGRESS = 0
+	SMTP_TRANSACTION_STATUS_RESET       = 1
+	SMTP_TRANSACTION_STATUS_COMPLETE    = 2
+)
+
+type SmtpTransactionStatus uint8
+
 type SmtpTransaction struct {
-	Hostname         string
-	From             []string
-	To               []string
-	RawData          []byte
-	B64Data          string
-	B64PlainAuth     string
-	AuthorizationId  string
-	Username         string
-	B64Username      string
-	Password         string
-	B64Password      string
-	ExtendedProtocol bool
-	Deferred         SmtpMessage
+	Status  SmtpTransactionStatus `json:"status"`
+	From    []string              `json:"from"`
+	To      []string              `json:"to"`
+	RawData []byte                `json:"-"`
+	B64Data string                `json:"data"`
+}
+
+type SmtpConnection struct {
+	Guid             string               `json:"guid"`
+	SrcAddr          string               `json:"srcAddr"`
+	Hostname         string               `json:"hostname"`
+	Transactions     []SmtpTransaction    `json:"transactions"`
+	Authentication   []SmtpAuthentication `json:"authentication"`
+	TLS              bool                 `json:"tls"`
+	ExtendedProtocol bool                 `json:"extended"`
+	StartEpochMs     uint64               `json:"startEpochMs"`
+	DurationMs       uint64               `json:"durationMs"`
+
+	Deferred SmtpMessage `json:"-"`
+}
+
+func (s *SmtpConnection) GetCurrentTransaction() *SmtpTransaction {
+	if len(s.Transactions) == 0 {
+		s.Transactions = []SmtpTransaction{SmtpTransaction{}}
+	}
+
+	lastTrans := &s.Transactions[len(s.Transactions)-1]
+	if lastTrans.Status != SMTP_TRANSACTION_STATUS_IN_PROGRESS {
+		s.Transactions = append(s.Transactions, SmtpTransaction{})
+		lastTrans = &s.Transactions[len(s.Transactions)-1]
+	}
+
+	return lastTrans
 }
 
 type SmtpMessage interface {
 	Matches([]byte) bool
-	Handle(*SmtpTransaction, []byte) string
+	Handle(*SmtpConnection, []byte) string
 }
 
 var smtpMessages []SmtpMessage = []SmtpMessage{
@@ -33,14 +71,14 @@ var smtpMessages []SmtpMessage = []SmtpMessage{
 	SmtpEtrnMessage{},
 }
 
-func Handle(transaction *SmtpTransaction, body []byte) string {
-	if transaction.Deferred != nil {
-		return transaction.Deferred.Handle(transaction, body)
+func Handle(connection *SmtpConnection, body []byte) string {
+	if connection.Deferred != nil {
+		return connection.Deferred.Handle(connection, body)
 	}
 
 	for _, message := range smtpMessages {
 		if message.Matches(body) {
-			return message.Handle(transaction, body)
+			return message.Handle(connection, body)
 		}
 	}
 

@@ -14,14 +14,15 @@ func (s SmtpFromMessage) Matches(arg []byte) bool {
 	return fromRegex.Match(arg)
 }
 
-func (s SmtpFromMessage) Handle(transaction *SmtpTransaction, arg []byte) string {
+func (s SmtpFromMessage) Handle(connection *SmtpConnection, arg []byte) string {
 	matches := fromRegex.FindSubmatch(arg)
+	lastTrans := connection.GetCurrentTransaction()
 	if len(matches) < 2 {
 		fmt.Println("warning: no from match")
-	} else if len(transaction.From) >= 100 {
+	} else if len(lastTrans.From) >= 100 {
 		fmt.Println("warning: more than 100 from fields supplied")
 	} else {
-		transaction.From = append(transaction.From, string(matches[1]))
+		lastTrans.From = append(lastTrans.From, string(matches[1]))
 	}
 
 	return "250 2.1.0 OK"

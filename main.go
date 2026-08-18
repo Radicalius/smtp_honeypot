@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -12,6 +13,8 @@ import (
 	"smtp_honeypot/protocol"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var tlsConfig *tls.Config
@@ -28,19 +31,29 @@ func _sendMessageWithLog(conn net.Conn, logger *SessionLogger, data []byte) {
 func HandleConnection(conn net.Conn) {
 	conn.SetDeadline(time.Now().Add(30 * time.Second))
 
-	logger, err := NewSessionLogger()
+	id := uuid.New().String()
+
+	logger, err := NewSessionLogger(id)
 	if err != nil {
 		fmt.Printf("warning: session logging failed to initialize: %s\n", err.Error())
 		return
 	}
 
+	connection := protocol.SmtpConnection{
+		Guid:         id,
+		SrcAddr:      conn.LocalAddr().String(),
+		StartEpochMs: uint64(time.Now().UnixMilli()),
+	}
+
 	defer func() {
 		conn.Close()
 		logger.Close()
+		connection.DurationMs = uint64(time.Now().UnixMilli()) - connection.StartEpochMs
+		data, _ := json.MarshalIndent(&connection, "", "  ")
+		fmt.Println(string(data))
+
 		<-handlerSemaphor
 	}()
-
-	var trans protocol.SmtpTransaction
 
 	_sendMessageWithLog(conn, logger, []byte("220 mail.example.com ESMTP\r\n"))
 
@@ -63,10 +76,6 @@ func HandleConnection(conn net.Conn) {
 
 		if strings.Contains(string(command), "QUIT") {
 			_sendMessageWithLog(conn, logger, []byte("221 2.0.0 Bye\r\n"))
-			conn.Close()
-
-			fmt.Printf("%v\n", trans)
-
 			return
 		}
 
@@ -82,10 +91,11 @@ func HandleConnection(conn net.Conn) {
 
 			conn = tlsConn
 			reader = bufio.NewReader(conn)
+			connection.TLS = true
 			continue
 		}
 
-		resp := protocol.Handle(&trans, command)
+		resp := protocol.Handle(&connection, command)
 
 		if resp != "" {
 			_sendMessageWithLog(conn, logger, []byte(resp+"\r\n"))

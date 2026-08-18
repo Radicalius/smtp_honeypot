@@ -14,15 +14,15 @@ func (s SmtpEhloMessage) Matches(arg []byte) bool {
 	return ehloRegex.Match(arg)
 }
 
-func (s SmtpEhloMessage) Handle(transaction *SmtpTransaction, arg []byte) string {
+func (s SmtpEhloMessage) Handle(connection *SmtpConnection, arg []byte) string {
 	matches := ehloRegex.FindSubmatch(arg)
 	if len(matches) >= 2 {
-		transaction.Hostname = string(matches[1])
+		connection.Hostname = string(matches[1])
 	} else {
 		fmt.Println("warning: ehlo missing submatch")
 	}
 
-	transaction.ExtendedProtocol = true
+	connection.ExtendedProtocol = true
 	return `250-{server_name}
 250-PIPELINING
 250-SIZE 10240000

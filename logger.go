@@ -6,8 +6,6 @@ import (
 	"io"
 	"os"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 const (
@@ -43,18 +41,19 @@ func (f SessionFrame) writeFrame(w io.Writer) error {
 }
 
 type SessionLogger struct {
-	fd *os.File
+	guid string
+	fd   *os.File
 }
 
-func NewSessionLogger() (*SessionLogger, error) {
-	id := uuid.New()
-	f, err := os.Create(fmt.Sprintf("data/sessions/%s.bin", id.String()))
+func NewSessionLogger(id string) (*SessionLogger, error) {
+	f, err := os.Create(fmt.Sprintf("data/sessions/%s.bin", id))
 	if err != nil {
 		return nil, fmt.Errorf("error opening log file: %s", err.Error())
 	}
 
 	return &SessionLogger{
-		fd: f,
+		guid: id,
+		fd:   f,
 	}, nil
 }
 

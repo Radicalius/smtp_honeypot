@@ -14,7 +14,7 @@ func (s SmtpEtrnMessage) Matches(arg []byte) bool {
 	return etrnRegex.Match(arg)
 }
 
-func (s SmtpEtrnMessage) Handle(transaction *SmtpTransaction, arg []byte) string {
+func (s SmtpEtrnMessage) Handle(connection *SmtpConnection, arg []byte) string {
 	matches := etrnRegex.FindSubmatch(arg)
 	if len(matches) >= 2 {
 		return fmt.Sprintf("250 Queuing for node %s started", string(matches[1]))

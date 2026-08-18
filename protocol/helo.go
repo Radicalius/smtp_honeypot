@@ -13,10 +13,10 @@ func (s SmtpHeloMessage) Matches(arg []byte) bool {
 	return heloRegex.Match(arg)
 }
 
-func (s SmtpHeloMessage) Handle(transaction *SmtpTransaction, arg []byte) string {
+func (s SmtpHeloMessage) Handle(connection *SmtpConnection, arg []byte) string {
 	matches := heloRegex.FindSubmatch(arg)
 	if len(matches) >= 2 {
-		transaction.Hostname = string(matches[1])
+		connection.Hostname = string(matches[1])
 	} else {
 		fmt.Println("warning: helo has no hostname submatch")
 	}

@@ -14,14 +14,15 @@ func (s SmtpToMessage) Matches(arg []byte) bool {
 	return toRegex.Match(arg)
 }
 
-func (s SmtpToMessage) Handle(transaction *SmtpTransaction, arg []byte) string {
+func (s SmtpToMessage) Handle(connection *SmtpConnection, arg []byte) string {
 	matches := toRegex.FindSubmatch(arg)
+	lastTrans := connection.GetCurrentTransaction()
 	if len(matches) < 2 {
 		fmt.Println("warning: no to match")
-	} else if len(transaction.To) >= 100 {
+	} else if len(lastTrans.To) >= 100 {
 		fmt.Println("warning: more than 100 to fields supplied")
 	} else {
-		transaction.To = append(transaction.To, string(matches[1]))
+		lastTrans.To = append(lastTrans.To, string(matches[1]))
 	}
 
 	return "250 2.1.5 OK"

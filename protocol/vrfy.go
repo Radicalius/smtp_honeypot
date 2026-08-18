@@ -15,7 +15,7 @@ func (s SmtpVrfyMessage) Matches(arg []byte) bool {
 	return vrfyRegex.Match(arg)
 }
 
-func (s SmtpVrfyMessage) Handle(transaction *SmtpTransaction, arg []byte) string {
+func (s SmtpVrfyMessage) Handle(connection *SmtpConnection, arg []byte) string {
 	matches := vrfyRegex.FindSubmatch(arg)
 	if len(matches) >= 2 {
 		addr := strings.Replace(string(matches[1]), "\r\n", "", 1)
