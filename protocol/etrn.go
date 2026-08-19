@@ -15,9 +15,12 @@ func (s SmtpEtrnMessage) Matches(arg []byte) bool {
 }
 
 func (s SmtpEtrnMessage) Handle(connection *SmtpConnection, arg []byte) string {
+	connection.EtrnEnabled = true
+
 	matches := etrnRegex.FindSubmatch(arg)
 	if len(matches) >= 2 {
-		return fmt.Sprintf("250 Queuing for node %s started", string(matches[1]))
+		connection.EtrnNode = string(matches[1])
+		return fmt.Sprintf("250 Queuing for node %s started", connection.EtrnNode)
 	}
 
 	fmt.Println("warning: etrn missing submatch")

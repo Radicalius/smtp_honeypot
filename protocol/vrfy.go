@@ -19,6 +19,7 @@ func (s SmtpVrfyMessage) Handle(connection *SmtpConnection, arg []byte) string {
 	matches := vrfyRegex.FindSubmatch(arg)
 	if len(matches) >= 2 {
 		addr := strings.Replace(string(matches[1]), "\r\n", "", 1)
+		connection.VerifiedAddrs = append(connection.VerifiedAddrs, addr)
 		return fmt.Sprintf("250 <%s>", addr)
 	}
 

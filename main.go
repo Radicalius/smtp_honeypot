@@ -92,6 +92,7 @@ func HandleConnection(conn net.Conn) {
 			conn = tlsConn
 			reader = bufio.NewReader(conn)
 			connection.TLS = true
+			connection.TLSInfo = protocol.GetTLSInfo(tlsConn)
 			continue
 		}
 

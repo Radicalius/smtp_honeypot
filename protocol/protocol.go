@@ -1,5 +1,43 @@
 package protocol
 
+import (
+	"crypto/tls"
+	"fmt"
+)
+
+type TLSInfo struct {
+	Version            string `json:"version"`
+	CypherSuite        string `json:"cypherSuite"`
+	ServerName         string `json:"serverName"`
+	NegotiatedProtocol string `json:"negotiatedProtocol"`
+}
+
+func GetTLSInfo(conn *tls.Conn) *TLSInfo {
+	state := conn.ConnectionState()
+
+	return &TLSInfo{
+		Version:            parseTLSVersion(state.Version),
+		CypherSuite:        tls.CipherSuiteName(state.CipherSuite),
+		ServerName:         state.ServerName,
+		NegotiatedProtocol: state.NegotiatedProtocol,
+	}
+}
+
+func parseTLSVersion(version uint16) string {
+	switch version {
+	case tls.VersionTLS10:
+		return "TLS 1.0"
+	case tls.VersionTLS11:
+		return "TLS 1.1"
+	case tls.VersionTLS12:
+		return "TLS 1.2"
+	case tls.VersionTLS13:
+		return "TLS 1.3"
+	default:
+		return fmt.Sprintf("unknown tls version (0x%x)", version)
+	}
+}
+
 type SmtpAuthentication struct {
 	Type            string `json:"type"`
 	B64PlainAuth    string `json:"-"`
@@ -32,8 +70,12 @@ type SmtpConnection struct {
 	Hostname         string               `json:"hostname"`
 	Transactions     []SmtpTransaction    `json:"transactions"`
 	Authentication   []SmtpAuthentication `json:"authentication"`
+	VerifiedAddrs    []string             `json:"verifiedAddrs"`
 	TLS              bool                 `json:"tls"`
+	TLSInfo          *TLSInfo             `json:"tlsInfo"`
 	ExtendedProtocol bool                 `json:"extended"`
+	EtrnEnabled      bool                 `json:"etrn"`
+	EtrnNode         string               `json:"etrnNode"`
 	StartEpochMs     uint64               `json:"startEpochMs"`
 	DurationMs       uint64               `json:"durationMs"`
 
