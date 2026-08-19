@@ -40,13 +40,13 @@ type SmtpConnection struct {
 	Deferred SmtpMessage `json:"-"`
 }
 
-func (s *SmtpConnection) GetCurrentTransaction() *SmtpTransaction {
+func (s *SmtpConnection) GetCurrentTransaction(createNewIfComplete bool) *SmtpTransaction {
 	if len(s.Transactions) == 0 {
 		s.Transactions = []SmtpTransaction{SmtpTransaction{}}
 	}
 
 	lastTrans := &s.Transactions[len(s.Transactions)-1]
-	if lastTrans.Status != SMTP_TRANSACTION_STATUS_IN_PROGRESS {
+	if lastTrans.Status != SMTP_TRANSACTION_STATUS_IN_PROGRESS && createNewIfComplete {
 		s.Transactions = append(s.Transactions, SmtpTransaction{})
 		lastTrans = &s.Transactions[len(s.Transactions)-1]
 	}
@@ -69,6 +69,7 @@ var smtpMessages []SmtpMessage = []SmtpMessage{
 	SmtpAuthPlainMessage{},
 	SmtpVrfyMessage{},
 	SmtpEtrnMessage{},
+	SmtpRsetMessage{},
 }
 
 func Handle(connection *SmtpConnection, body []byte) string {

@@ -17,7 +17,7 @@ func (s SmtpDataMessage) Handle(connection *SmtpConnection, message []byte) stri
 		return "354 3.0.0 Start mail input"
 	}
 
-	lastTransaction := connection.GetCurrentTransaction()
+	lastTransaction := connection.GetCurrentTransaction(true)
 
 	if string(message) != "." {
 		lastTransaction.RawData = append(lastTransaction.RawData, message...)

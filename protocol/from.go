@@ -16,7 +16,7 @@ func (s SmtpFromMessage) Matches(arg []byte) bool {
 
 func (s SmtpFromMessage) Handle(connection *SmtpConnection, arg []byte) string {
 	matches := fromRegex.FindSubmatch(arg)
-	lastTrans := connection.GetCurrentTransaction()
+	lastTrans := connection.GetCurrentTransaction(true)
 	if len(matches) < 2 {
 		fmt.Println("warning: no from match")
 	} else if len(lastTrans.From) >= 100 {
