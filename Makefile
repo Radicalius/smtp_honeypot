@@ -7,7 +7,13 @@ install: build upload cert service
 build:
 	go build
 
-test: build
+clean-data:
+	rm -f data/sessions/*
+	rm -f data/transactions/*
+
+test: build clean-data
+	-pkill -f smtp_honeypot
+	./smtp_honeypot &
 	cd tests && python3 runner.py
 
 upload:

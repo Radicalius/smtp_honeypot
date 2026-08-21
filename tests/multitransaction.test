@@ -14,3 +14,5 @@ echo -e "EHLO test\r\nDATA\r\na\r\n.\r\nDATA\r\nb\r\n.\r\nQUIT\r\n" | nc localho
 354 3.0.0 Start mail input
 250 2.0.0 OK
 221 2.0.0 Bye
+
+{"hostname":"test","transactions":[{"status":2,"from":null,"to":null,"data":"YQ=="},{"status":2,"from":null,"to":null,"data":"Yg=="}],"authentication":null,"verifiedAddrs":null,"tls":false,"tlsInfo":null,"extended":true,"etrn":false,"etrnNode":""}

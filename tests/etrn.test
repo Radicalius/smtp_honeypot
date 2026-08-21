@@ -11,3 +11,5 @@ echo -e "EHLO test\r\nETRN test.com\r\nQUIT\r\n" | nc localhost 2525
 250 8BITMIME
 250 Queuing for node test.com started
 221 2.0.0 Bye
+
+{"hostname":"test","transactions":null,"authentication":null,"verifiedAddrs":null,"tls":false,"tlsInfo":null,"extended":true,"etrn":true,"etrnNode":"test.com"}

@@ -2,10 +2,14 @@ package main
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
+	"smtp_honeypot/protocol"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -68,4 +72,47 @@ func (s *SessionLogger) RecordMessage(dir MessageDirection, data []byte) error {
 
 func (s *SessionLogger) Close() {
 	s.fd.Close()
+}
+
+type ConnectionLogger struct {
+	fd     *os.File
+	length int64
+}
+
+func NewTransactionLogger() (*ConnectionLogger, error) {
+	id := uuid.New().String()
+	f, err := os.Create(fmt.Sprintf("data/transactions/%s.jsonl", id))
+	if err != nil {
+		return nil, fmt.Errorf("error opening log file: %s", err.Error())
+	}
+
+	return &ConnectionLogger{
+		fd:     f,
+		length: 0,
+	}, nil
+}
+
+func (t *ConnectionLogger) WriteTransaction(connection protocol.SmtpConnection) error {
+	if t.length > 5000000 {
+		id := uuid.New().String()
+		f, err := os.Create(fmt.Sprintf("data/transactions/%s.jsonl", id))
+		if err != nil {
+			return fmt.Errorf("error opening log file: %s", err.Error())
+		}
+
+		t.fd.Close()
+		t.fd = f
+	}
+
+	data, err := json.Marshal(connection)
+	if err != nil {
+		return fmt.Errorf("error marshalling transaction: %s\n", err.Error())
+	}
+
+	_, err = t.fd.Write(append(data, '\n'))
+	if err != nil {
+		return fmt.Errorf("error writing transaction: %s\n", err.Error())
+	}
+
+	return nil
 }

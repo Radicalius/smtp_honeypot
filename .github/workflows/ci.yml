@@ -27,19 +27,5 @@ jobs:
       - name: Install swaks
         run: sudo apt-get install -y swaks
 
-      - name: Start server
-        run: ./smtp_honeypot &
-        env:
-          SMTP_PORT: "2525"
-
-      - name: Wait for server
-        run: |
-          for i in $(seq 1 10); do
-            nc -z localhost 2525 && exit 0
-            sleep 0.5
-          done
-          echo "Server failed to start"
-          exit 1
-
       - name: Run tests
-        run: cd tests && python3 runner.py
+        run: make test

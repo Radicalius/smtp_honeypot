@@ -11,3 +11,5 @@ echo -e "EHLO test\r\nVRFY test@test.com\r\nQUIT\r\n" | nc localhost 2525
 250 8BITMIME
 250 <test@test.com>
 221 2.0.0 Bye
+
+{"hostname":"test","transactions":null,"authentication":null,"verifiedAddrs":["test@test.com"],"tls":false,"tlsInfo":null,"extended":true,"etrn":false,"etrnNode":""}
