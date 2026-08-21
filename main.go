@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -28,7 +27,7 @@ func _sendMessageWithLog(conn net.Conn, logger *SessionLogger, data []byte) {
 	}
 }
 
-func HandleConnection(conn net.Conn) {
+func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 	conn.SetDeadline(time.Now().Add(30 * time.Second))
 
 	id := uuid.New().String()
@@ -49,8 +48,7 @@ func HandleConnection(conn net.Conn) {
 		conn.Close()
 		logger.Close()
 		connection.DurationMs = uint64(time.Now().UnixMilli()) - connection.StartEpochMs
-		data, _ := json.MarshalIndent(&connection, "", "  ")
-		fmt.Println(string(data))
+		connLogger.WriteTransaction(connection)
 
 		<-handlerSemaphor
 	}()
@@ -133,6 +131,11 @@ func main() {
 		log.Fatalf("error listening on port 2525: %s\n", err.Error())
 	}
 
+	transactionLogger, err := NewTransactionLogger()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -142,7 +145,7 @@ func main() {
 
 		select {
 		case handlerSemaphor <- 0:
-			go HandleConnection(conn)
+			go HandleConnection(conn, transactionLogger)
 		default:
 			conn.Close()
 		}
