@@ -1,8 +1,8 @@
-SERVER_IP="54.234.132.60"
+SERVER_IP=""
 
 deploy: build upload restart
 
-install: build upload cert service
+install: user build upload data service
 
 build:
 	go build
@@ -20,13 +20,17 @@ upload:
 	scp -i smtp_honeypot.pem smtp_honeypot "ubuntu@$(SERVER_IP):~/"
 	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo mv smtp_honeypot /usr/local/bin
 
-cert:
+data:
 	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo mkdir -p /etc/smtp_honeypot
 	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo chown smtp_honeypot /etc/smtp_honeypot
 	scp -i smtp_honeypot.pem server.crt "ubuntu@$(SERVER_IP):~/"
 	scp -i smtp_honeypot.pem server.key "ubuntu@$(SERVER_IP):~/"
 	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo mv server.* /etc/smtp_honeypot
 	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo chown smtp_honeypot /etc/smtp_honeypot/*
+	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo mkdir -p /etc/smtp_honeypot/data/sessions
+	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo mkdir -p /etc/smtp_honeypot/data/transactions
+	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo chown smtp_honeypot /etc/smtp_honeypot/data/sessions
+	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo chown smtp_honeypot /etc/smtp_honeypot/data/transactions
 
 service:
 	scp -i smtp_honeypot.pem smtp_honeypot.service "ubuntu@$(SERVER_IP):~/"

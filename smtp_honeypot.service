@@ -9,7 +9,7 @@ CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 ExecStart=/usr/local/bin/smtp_honeypot
 WorkingDirectory=/etc/smtp_honeypot
-Environment="SMTP_HONEYPOT_PORT=2525"
+Environment="SMTP_HONEYPOT_PORT=465"
 Restart=on-failure
 RestartSec=5
 

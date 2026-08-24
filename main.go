@@ -40,7 +40,7 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 
 	connection := protocol.SmtpConnection{
 		Guid:         id,
-		SrcAddr:      conn.LocalAddr().String(),
+		SrcAddr:      conn.RemoteAddr().String(),
 		StartEpochMs: uint64(time.Now().UnixMilli()),
 	}
 
