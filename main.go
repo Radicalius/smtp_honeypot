@@ -53,9 +53,18 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 		<-handlerSemaphor
 	}()
 
-	_sendMessageWithLog(conn, logger, []byte("220 mail.example.com ESMTP\r\n"))
-
+	conn = NewBufferedTLSConn(conn)
 	reader := bufio.NewReader(conn)
+
+	if isTls, err := conn.(*BufferedTLSConn).TLSCheck(); isTls {
+		conn, reader, err = TlsUpgrade(conn, &connection)
+		if err != nil {
+			fmt.Printf("error upgrading tls connection: %s\n", err.Error())
+			return
+		}
+	}
+
+	_sendMessageWithLog(conn, logger, []byte("220 mail.example.com ESMTP\r\n"))
 
 	for {
 		conn.SetReadDeadline(time.Now().Add(5 * time.Second))
@@ -80,17 +89,12 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 		if strings.Contains(string(command), "STARTTLS") {
 			_sendMessageWithLog(conn, logger, []byte("220 2.0.0 Ready to start TLS\r\n"))
 
-			tlsConn := tls.Server(conn, tlsConfig)
-
-			if err := tlsConn.Handshake(); err != nil {
-				conn.Close()
+			conn, reader, err = TlsUpgrade(conn, &connection)
+			if err != nil {
+				fmt.Printf("error upgrading tls connection on starttls: %s\n", err.Error())
 				return
 			}
 
-			conn = tlsConn
-			reader = bufio.NewReader(conn)
-			connection.TLS = true
-			connection.TLSInfo = protocol.GetTLSInfo(tlsConn)
 			continue
 		}
 

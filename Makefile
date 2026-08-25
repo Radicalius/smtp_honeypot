@@ -55,3 +55,6 @@ user:
 
 logs:
 	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo journalctl -u smtp_honeypot -n 20
+
+download:
+	scp -i smtp_honeypot.pem "ubuntu@$(SERVER_IP):/etc/smtp_honeypot/data/sessions/*" data/download
