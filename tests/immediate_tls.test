@@ -46,4 +46,4 @@ swaks --server localhost --port 2525 \
 <~  221 2.0.0 Bye
 === Connection closed with remote host.
 
-{"hostname":"fixed.host","transactions":[{"status":2,"from":["recipient@test.com"],"to":["recipient@test.com"],"data":"RGF0ZTogVGh1LCAwMSBKYW4gMjAyMCAwMDowMDowMCArMDAwMFRvOiByZWNpcGllbnRAdGVzdC5jb21Gcm9tOiByZWNpcGllbnRAdGVzdC5jb21TdWJqZWN0OiB0ZXN0TWVzc2FnZS1JZDogPGZpeGVkQHRlc3Q+WC1NYWlsZXI6IHN3YWtzIHYyMDI0MDEwMy4wIGpldG1vcmUub3JnL2pvaG4vY29kZS9zd2Frcy9UaGlzIGlzIGEgdGVzdCBtYWlsaW5n"}],"authentication":null,"verifiedAddrs":null,"tls":false,"tlsInfo":null,"extended":true,"etrn":false,"etrnNode":""}
+{"hostname":"fixed.host","transactions":[{"status":2,"from":["recipient@test.com"],"to":["recipient@test.com"],"data":"RGF0ZTogVGh1LCAwMSBKYW4gMjAyMCAwMDowMDowMCArMDAwMFRvOiByZWNpcGllbnRAdGVzdC5jb21Gcm9tOiByZWNpcGllbnRAdGVzdC5jb21TdWJqZWN0OiB0ZXN0TWVzc2FnZS1JZDogPGZpeGVkQHRlc3Q+WC1NYWlsZXI6IHN3YWtzIHYyMDI0MDEwMy4wIGpldG1vcmUub3JnL2pvaG4vY29kZS9zd2Frcy9UaGlzIGlzIGEgdGVzdCBtYWlsaW5n"}],"authentication":null,"verifiedAddrs":null,"tls":true,"extended":true,"etrn":false,"etrnNode":""}
