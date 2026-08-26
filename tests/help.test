@@ -1,0 +1,10 @@
+printf "HELP\r\nHELP test\r\nQUIT\r\n" | nc localhost 2525
+
+220 mail.example.com ESMTP
+214-This server supports the following commands:
+214-HELO EHLO MAIL RCPT DATA RSET VRFY EXPN HELP NOOP QUIT STARTTLS AUTH
+214 End of HELP info
+214 Help entry for test
+221 2.0.0 Bye
+
+{}
