@@ -1,0 +1,7 @@
+printf "HELO\r\nQUIT\r\n" | nc localhost 2525
+
+220 mail.example.com ESMTP
+250 example.com
+221 2.0.0 Bye
+
+{"hostname":"","transactions":null,"authentication":null,"verifiedAddrs":null,"tls":false,"tlsInfo":null,"extended":false,"etrn":false,"etrnNode":""}
