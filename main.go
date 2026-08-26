@@ -41,6 +41,7 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 	connection := protocol.SmtpConnection{
 		Guid:         id,
 		SrcAddr:      conn.RemoteAddr().String(),
+		DstAddr:      conn.LocalAddr().String(),
 		StartEpochMs: uint64(time.Now().UnixMilli()),
 	}
 
@@ -106,10 +107,32 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 	}
 }
 
+func Listen(port string, connLogger *ConnectionLogger) {
+	listener, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatalf("error listening on port 2525: %s\n", err.Error())
+	}
+
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			fmt.Printf("warning: client failed to connect: %s\n", err.Error())
+			continue
+		}
+
+		select {
+		case handlerSemaphor <- 0:
+			go HandleConnection(conn, connLogger)
+		default:
+			conn.Close()
+		}
+	}
+}
+
 func main() {
-	port := os.Getenv("SMTP_HONEYPOT_PORT")
-	if port == "" {
-		port = "2525"
+	ports := os.Getenv("SMTP_HONEYPOT_PORT")
+	if ports == "" {
+		ports = "2525"
 	}
 
 	certPath := os.Getenv("SMTP_HONEYPOT_CERT_PATH")
@@ -130,28 +153,17 @@ func main() {
 		Certificates: []tls.Certificate{cert},
 	}
 
-	listener, err := net.Listen("tcp", ":"+port)
-	if err != nil {
-		log.Fatalf("error listening on port 2525: %s\n", err.Error())
-	}
-
-	transactionLogger, err := NewTransactionLogger()
+	connectionLogger, err := NewConnectionLogger()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			fmt.Printf("warning: client failed to connect: %s\n", err.Error())
-			continue
-		}
-
-		select {
-		case handlerSemaphor <- 0:
-			go HandleConnection(conn, transactionLogger)
-		default:
-			conn.Close()
+	allPorts := strings.Split(ports, ",")
+	if len(allPorts) > 1 {
+		for _, port := range allPorts[1:] {
+			go Listen(port, connectionLogger)
 		}
 	}
+
+	Listen(allPorts[0], connectionLogger)
 }

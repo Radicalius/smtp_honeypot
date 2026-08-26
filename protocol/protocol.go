@@ -67,6 +67,7 @@ type SmtpTransaction struct {
 type SmtpConnection struct {
 	Guid             string               `json:"guid"`
 	SrcAddr          string               `json:"srcAddr"`
+	DstAddr          string               `json:"DstAddr"`
 	Hostname         string               `json:"hostname"`
 	Transactions     []SmtpTransaction    `json:"transactions"`
 	Authentication   []SmtpAuthentication `json:"authentication"`

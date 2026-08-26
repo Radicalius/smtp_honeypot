@@ -79,7 +79,7 @@ type ConnectionLogger struct {
 	length int64
 }
 
-func NewTransactionLogger() (*ConnectionLogger, error) {
+func NewConnectionLogger() (*ConnectionLogger, error) {
 	id := uuid.New().String()
 	f, err := os.Create(fmt.Sprintf("data/transactions/%s.jsonl", id))
 	if err != nil {
