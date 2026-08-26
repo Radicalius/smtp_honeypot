@@ -112,6 +112,7 @@ var smtpMessages []SmtpMessage = []SmtpMessage{
 	SmtpVrfyMessage{},
 	SmtpEtrnMessage{},
 	SmtpRsetMessage{},
+	SmtpHelpMessage{},
 }
 
 func Handle(connection *SmtpConnection, body []byte) string {
