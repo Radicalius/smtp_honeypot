@@ -104,6 +104,13 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 		if resp != "" {
 			_sendMessageWithLog(conn, logger, []byte(resp+"\r\n"))
 		}
+
+		if resp != "" {
+			connection.Commands = append(connection.Commands, protocol.SmtpCommand{
+				Command:  string(command),
+				Response: resp,
+			})
+		}
 	}
 }
 

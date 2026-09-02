@@ -38,6 +38,11 @@ func parseTLSVersion(version uint16) string {
 	}
 }
 
+type SmtpCommand struct {
+	Command  string `json:"command"`
+	Response string `json:"response"`
+}
+
 type SmtpAuthentication struct {
 	Type            string `json:"type"`
 	B64PlainAuth    string `json:"-"`
@@ -71,6 +76,7 @@ type SmtpConnection struct {
 	Hostname         string               `json:"hostname"`
 	Transactions     []SmtpTransaction    `json:"transactions"`
 	Authentication   []SmtpAuthentication `json:"authentication"`
+	Commands         []SmtpCommand        `json:"commands"`
 	VerifiedAddrs    []string             `json:"verifiedAddrs"`
 	TLS              bool                 `json:"tls"`
 	TLSInfo          *TLSInfo             `json:"tlsInfo"`
