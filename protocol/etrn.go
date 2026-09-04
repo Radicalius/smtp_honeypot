@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-var etrnRegex = regexp.MustCompile("ETRN (.*)")
+var etrnRegex = regexp.MustCompile("(?i)ETRN (.*)")
 
 type SmtpEtrnMessage struct {
 }

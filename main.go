@@ -82,12 +82,12 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 		command := bytes.TrimRight(buf, "\r\n")
 		logger.RecordMessage(MessageDirection(MESSAGE_DIRECTION_CLIENT_TO_SERVER), buf)
 
-		if strings.Contains(string(command), "QUIT") {
+		if strings.Contains(strings.ToUpper(string(command)), "QUIT") {
 			_sendMessageWithLog(conn, logger, []byte("221 2.0.0 Bye\r\n"))
 			return
 		}
 
-		if strings.Contains(string(command), "STARTTLS") {
+		if strings.Contains(strings.ToUpper(string(command)), "STARTTLS") {
 			_sendMessageWithLog(conn, logger, []byte("220 2.0.0 Ready to start TLS\r\n"))
 
 			conn, reader, err = TlsUpgrade(conn, &connection)

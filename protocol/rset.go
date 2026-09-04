@@ -1,10 +1,12 @@
 package protocol
 
+import "strings"
+
 type SmtpRsetMessage struct {
 }
 
 func (s SmtpRsetMessage) Matches(arg []byte) bool {
-	return string(arg) == "RSET"
+	return strings.ToUpper(string(arg)) == "RSET"
 }
 
 func (s SmtpRsetMessage) Handle(connection *SmtpConnection, arg []byte) string {

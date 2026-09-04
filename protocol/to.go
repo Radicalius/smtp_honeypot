@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-var toRegex = regexp.MustCompile("RCPT TO:<([^>]*)>")
+var toRegex = regexp.MustCompile("(?i)RCPT TO:<([^>]*)>")
 
 type SmtpToMessage struct {
 }

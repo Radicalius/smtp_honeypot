@@ -8,7 +8,7 @@ import (
 
 type SmtpHelpMessage struct{}
 
-var helpRegex = regexp.MustCompile("(HELP$)|(HELP (.*))")
+var helpRegex = regexp.MustCompile("(?i)(HELP$)|(HELP (.*))")
 
 func (s SmtpHelpMessage) Matches(arg []byte) bool {
 	return bytes.Contains(arg, []byte("HELP"))

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var ehloRegex = regexp.MustCompile("(EHLO$)|(EHLO (.*))")
+var ehloRegex = regexp.MustCompile("(?i)(EHLO$)|(EHLO (.*))")
 
 type SmtpEhloMessage struct {
 }
