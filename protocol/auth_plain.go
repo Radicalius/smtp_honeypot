@@ -7,7 +7,7 @@ import (
 	"regexp"
 )
 
-var authPlainRegex = regexp.MustCompile("AUTH PLAIN (.*)")
+var authPlainRegex = regexp.MustCompile("(?i)AUTH PLAIN (.*)")
 
 type SmtpAuthPlainMessage struct {
 }

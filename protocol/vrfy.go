@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var vrfyRegex = regexp.MustCompile("VRFY (.*)")
+var vrfyRegex = regexp.MustCompile("(?i)VRFY (.*)")
 
 type SmtpVrfyMessage struct {
 }

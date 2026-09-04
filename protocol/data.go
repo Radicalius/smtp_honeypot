@@ -2,12 +2,13 @@ package protocol
 
 import (
 	"encoding/base64"
+	"strings"
 )
 
 type SmtpDataMessage struct{}
 
 func (s SmtpDataMessage) Matches(message []byte) bool {
-	return string(message) == "DATA"
+	return strings.ToUpper(string(message)) == "DATA"
 }
 
 func (s SmtpDataMessage) Handle(connection *SmtpConnection, message []byte) string {

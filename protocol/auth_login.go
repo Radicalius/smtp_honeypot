@@ -1,16 +1,19 @@
 package protocol
 
-import "encoding/base64"
+import (
+	"encoding/base64"
+	"strings"
+)
 
 type SmtpAuthLoginMessage struct {
 }
 
 func (s SmtpAuthLoginMessage) Matches(arg []byte) bool {
-	return string(arg) == "AUTH LOGIN"
+	return strings.ToUpper(string(arg)) == "AUTH LOGIN"
 }
 
 func (s SmtpAuthLoginMessage) Handle(connection *SmtpConnection, arg []byte) string {
-	if string(arg) == "AUTH LOGIN" {
+	if s.Matches(arg) {
 		connection.Authentication = append(connection.Authentication, SmtpAuthentication{
 			Type: "LOGIN",
 		})

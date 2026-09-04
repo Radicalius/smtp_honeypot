@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-var fromRegex = regexp.MustCompile("MAIL FROM:<([^>]*)>")
+var fromRegex = regexp.MustCompile("(?i)MAIL FROM:<([^>]*)>")
 
 type SmtpFromMessage struct {
 }

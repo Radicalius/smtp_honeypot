@@ -1,0 +1,18 @@
+echo -e "ehlo localhost\nmail from:<sender@example.com>\nrcpt to:<recipient@example.com>\ndata\nDate: Thu, 01 Jan 2020 00:00:00 +0000\nTo: recipient@example.com\nFrom: sender@example.com\nSubject: test\n\nThis is a test message.\n.\nquit\n" | nc localhost 2525
+
+220 mail.example.com ESMTP
+250-{server_name}
+250-PIPELINING
+250-SIZE 10240000
+250-VRFY
+250-ETRN
+250-STARTTLS
+250-AUTH LOGIN PLAIN
+250 8BITMIME
+250 2.1.0 OK
+250 2.1.5 OK
+354 3.0.0 Start mail input
+250 2.0.0 OK
+221 2.0.0 Bye
+
+{"hostname":"localhost","transactions":[{"status":2,"from":["sender@example.com"],"to":["recipient@example.com"],"data":"RGF0ZTogVGh1LCAwMSBKYW4gMjAyMCAwMDowMDowMCArMDAwMFRvOiByZWNpcGllbnRAZXhhbXBsZS5jb21Gcm9tOiBzZW5kZXJAZXhhbXBsZS5jb21TdWJqZWN0OiB0ZXN0VGhpcyBpcyBhIHRlc3QgbWVzc2FnZS4="}]}

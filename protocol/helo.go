@@ -4,7 +4,7 @@ import (
 	"regexp"
 )
 
-var heloRegex = regexp.MustCompile("(HELO$)|(HELO (.*))")
+var heloRegex = regexp.MustCompile("(?i)(HELO$)|(HELO (.*))")
 
 type SmtpHeloMessage struct{}
 
