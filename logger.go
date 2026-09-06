@@ -8,8 +8,6 @@ import (
 	"os"
 	"smtp_honeypot/protocol"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 var logRootPath = os.Getenv("SMTP_HONEYPOT_LOG_ROOT")
@@ -77,33 +75,34 @@ func (s *SessionLogger) Close() {
 }
 
 type ConnectionLogger struct {
-	fd     *os.File
-	length int64
+	fd *os.File
+	ds string
 }
 
 func NewConnectionLogger() (*ConnectionLogger, error) {
-	id := uuid.New().String()
-	f, err := os.Create(fmt.Sprintf(logRootPath+"/transactions/%s.jsonl", id))
+	dateStamp := time.Now().Format("2006-01-02")
+	f, err := os.Create(fmt.Sprintf(logRootPath+"/transactions/%s.jsonl", dateStamp))
 	if err != nil {
 		return nil, fmt.Errorf("error opening log file: %s", err.Error())
 	}
 
 	return &ConnectionLogger{
-		fd:     f,
-		length: 0,
+		fd: f,
+		ds: dateStamp,
 	}, nil
 }
 
 func (t *ConnectionLogger) WriteTransaction(connection protocol.SmtpConnection) error {
-	if t.length > 5000000 {
-		id := uuid.New().String()
-		f, err := os.Create(fmt.Sprintf(logRootPath+"/transactions/%s.jsonl", id))
+	dateStamp := time.Now().Format("2006-01-02")
+	if dateStamp != t.ds {
+		f, err := os.Create(fmt.Sprintf(logRootPath+"/transactions/%s.jsonl", dateStamp))
 		if err != nil {
 			return fmt.Errorf("error opening log file: %s", err.Error())
 		}
 
 		t.fd.Close()
 		t.fd = f
+		t.ds = dateStamp
 	}
 
 	data, err := json.Marshal(connection)
