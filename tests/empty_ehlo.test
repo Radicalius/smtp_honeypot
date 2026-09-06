@@ -1,7 +1,7 @@
 printf "EHLO\r\nQUIT\r\n" | nc localhost 2525
 
-220 mail.example.com ESMTP
-250-{server_name}
+220 mx01.example.net ESMTP
+250-mx01.example.net
 250-PIPELINING
 250-SIZE 10240000
 250-VRFY

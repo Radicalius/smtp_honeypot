@@ -65,7 +65,7 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 		}
 	}
 
-	_sendMessageWithLog(conn, logger, []byte("220 mail.example.com ESMTP\r\n"))
+	_sendMessageWithLog(conn, logger, []byte("220 "+protocol.Identity+" ESMTP\r\n"))
 
 	for {
 		conn.SetReadDeadline(time.Now().Add(5 * time.Second))
@@ -137,6 +137,11 @@ func Listen(port string, connLogger *ConnectionLogger) {
 }
 
 func main() {
+	identityEnvvar := os.Getenv("SMTP_HONEYPOT_IDENTITY")
+	if identityEnvvar != "" {
+		protocol.Identity = identityEnvvar
+	}
+
 	ports := os.Getenv("SMTP_HONEYPOT_PORT")
 	if ports == "" {
 		ports = "2525"

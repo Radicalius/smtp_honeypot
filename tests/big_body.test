@@ -8,9 +8,9 @@ swaks --server localhost --port 2525 \
 
 === Trying localhost:2525...
 === Connected to localhost.
-<-  220 mail.example.com ESMTP
+<-  220 mx01.example.net ESMTP
  -> EHLO fixed.host
-<-  250-{server_name}
+<-  250-mx01.example.net
 <-  250-PIPELINING
 <-  250-SIZE 10240000
 <-  250-VRFY

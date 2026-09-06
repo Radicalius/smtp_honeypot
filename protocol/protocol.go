@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+var Identity string = "mx01.example.net"
+
 type TLSInfo struct {
 	Version            string `json:"version"`
 	CypherSuite        string `json:"cypherSuite"`

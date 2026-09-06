@@ -21,7 +21,7 @@ func (s SmtpEhloMessage) Handle(connection *SmtpConnection, arg []byte) string {
 	}
 
 	connection.ExtendedProtocol = true
-	return strings.ReplaceAll(`250-{server_name}
+	return strings.ReplaceAll("250-"+Identity+`
 250-PIPELINING
 250-SIZE 10240000
 250-VRFY

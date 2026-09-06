@@ -14,9 +14,9 @@ swaks --server localhost --port 2525 \
 === TLS peer[0]   subject=[/CN=localhost]
 ===               commonName=[localhost], subjectAltName=[] notAfter=[2027-08-09T23:17:10Z]
 === TLS peer certificate failed CA verification (self-signed certificate), passed host verification (using host localhost to verify)
-<~  220 mail.example.com ESMTP
+<~  220 mx01.example.net ESMTP
  ~> EHLO fixed.host
-<~  250-{server_name}
+<~  250-mx01.example.net
 <~  250-PIPELINING
 <~  250-SIZE 10240000
 <~  250-VRFY
