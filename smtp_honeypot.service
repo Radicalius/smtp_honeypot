@@ -1,6 +1,8 @@
 [Unit]
 Description=SMTP Honeypot
 After=network.target
+Requires=smtp-honeypot-network.service
+After=smtp-honeypot-network.service
 
 [Service]
 Type=simple
@@ -17,11 +19,14 @@ ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
 RestrictSUIDSGID=true
-ReadWritePaths=/etc/smtp_honeypot/data
+ReadWritePaths=/var/log/smtp_honeypot/
 
 ExecStart=/usr/local/bin/smtp_honeypot
 WorkingDirectory=/etc/smtp_honeypot
 Environment="SMTP_HONEYPOT_PORT=25,465,587"
+Environment="SMTP_HONEYPOT_LOG_ROOT=/var/log/smtp_honeypot"
+
+NetworkNamespacePath=/run/netns/smtp_honeypot
 
 Restart=on-failure
 RestartSec=5

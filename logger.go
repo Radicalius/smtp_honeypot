@@ -12,6 +12,8 @@ import (
 	"github.com/google/uuid"
 )
 
+var logRootPath = os.Getenv("SMTP_HONEYPOT_LOG_ROOT")
+
 const (
 	MESSAGE_DIRECTION_CLIENT_TO_SERVER uint8 = 1
 	MESSAGE_DIRECTION_SERVER_TO_CLIENT uint8 = 2
@@ -50,7 +52,7 @@ type SessionLogger struct {
 }
 
 func NewSessionLogger(id string) (*SessionLogger, error) {
-	f, err := os.Create(fmt.Sprintf("data/sessions/%s.bin", id))
+	f, err := os.Create(fmt.Sprintf(logRootPath+"/sessions/%s.bin", id))
 	if err != nil {
 		return nil, fmt.Errorf("error opening log file: %s", err.Error())
 	}
@@ -81,7 +83,7 @@ type ConnectionLogger struct {
 
 func NewConnectionLogger() (*ConnectionLogger, error) {
 	id := uuid.New().String()
-	f, err := os.Create(fmt.Sprintf("data/transactions/%s.jsonl", id))
+	f, err := os.Create(fmt.Sprintf(logRootPath+"/transactions/%s.jsonl", id))
 	if err != nil {
 		return nil, fmt.Errorf("error opening log file: %s", err.Error())
 	}
@@ -95,7 +97,7 @@ func NewConnectionLogger() (*ConnectionLogger, error) {
 func (t *ConnectionLogger) WriteTransaction(connection protocol.SmtpConnection) error {
 	if t.length > 5000000 {
 		id := uuid.New().String()
-		f, err := os.Create(fmt.Sprintf("data/transactions/%s.jsonl", id))
+		f, err := os.Create(fmt.Sprintf(logRootPath+"/transactions/%s.jsonl", id))
 		if err != nil {
 			return fmt.Errorf("error opening log file: %s", err.Error())
 		}

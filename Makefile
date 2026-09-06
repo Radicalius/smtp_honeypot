@@ -13,8 +13,9 @@ clean-data:
 
 test: build clean-data
 	-pkill -f smtp_honeypot
-	./smtp_honeypot &
+	SMTP_HONEYPOT_LOG_ROOT=./data ./smtp_honeypot &
 	cd tests && python3 runner.py
+	-pkill -f smtp_honeypot
 
 upload:
 	scp -i smtp_honeypot.pem smtp_honeypot "ubuntu@$(SERVER_IP):~/"
@@ -57,4 +58,5 @@ logs:
 	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo journalctl -u smtp_honeypot -n 20
 
 download:
-	scp -i smtp_honeypot.pem "ubuntu@$(SERVER_IP):/etc/smtp_honeypot/data/sessions/*" data/download
+	scp -i smtp_honeypot.pem "ubuntu@$(SERVER_IP):/etc/smtp_honeypot/data/sessions/*" data/download/sessions
+	scp -i smtp_honeypot.pem "ubuntu@$(SERVER_IP):/etc/smtp_honeypot/data/transactions/*" data/download/transactions
