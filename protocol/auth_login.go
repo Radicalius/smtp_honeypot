@@ -2,23 +2,37 @@ package protocol
 
 import (
 	"encoding/base64"
-	"strings"
+	"regexp"
 )
+
+var authLoginRegex = regexp.MustCompile(`(?i)^AUTH LOGIN(?:\s+(\S+))?$`)
 
 type SmtpAuthLoginMessage struct {
 }
 
 func (s SmtpAuthLoginMessage) Matches(arg []byte) bool {
-	return strings.ToUpper(string(arg)) == "AUTH LOGIN"
+	return authLoginRegex.Match(arg)
 }
 
 func (s SmtpAuthLoginMessage) Handle(connection *SmtpConnection, arg []byte) string {
-	if s.Matches(arg) {
-		connection.Authentication = append(connection.Authentication, SmtpAuthentication{
-			Type: "LOGIN",
-		})
+	matches := authLoginRegex.FindSubmatch(arg)
+	if len(matches) > 0 {
+		auth := SmtpAuthentication{Type: "LOGIN"}
+		if len(matches) > 1 && len(matches[1]) > 0 {
+			auth.B64Username = string(matches[1])
+			decoded, err := base64.StdEncoding.DecodeString(string(matches[1]))
+			if err == nil {
+				auth.Username = string(decoded)
+			}
+		}
+
+		connection.Authentication = append(connection.Authentication, auth)
 		connection.Deferred = s
-		return "334 VXNlcm5hbWU6"
+		if auth.Username == "" {
+			return "334 VXNlcm5hbWU6"
+		}
+
+		return "334 UGFzc3dvcmQ6"
 	}
 
 	lastAuth := &connection.Authentication[len(connection.Authentication)-1]
