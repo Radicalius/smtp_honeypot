@@ -1,7 +1,6 @@
 package protocol
 
 import (
-	"bytes"
 	"regexp"
 	"strings"
 )
@@ -11,7 +10,7 @@ type SmtpHelpMessage struct{}
 var helpRegex = regexp.MustCompile("(?i)(HELP$)|(HELP (.*))")
 
 func (s SmtpHelpMessage) Matches(arg []byte) bool {
-	return bytes.Contains(arg, []byte("HELP"))
+	return helpRegex.Match(arg)
 }
 
 func (s SmtpHelpMessage) Handle(connection *SmtpConnection, arg []byte) string {
