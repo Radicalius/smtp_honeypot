@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"smtp_honeypot/protocol"
 	"time"
@@ -116,4 +118,32 @@ func (t *ConnectionLogger) WriteTransaction(connection protocol.SmtpConnection) 
 	}
 
 	return nil
+}
+
+func (c *ConnectionLogger) PublishAxiomTransaction(connection protocol.SmtpConnection) error {
+	axiomUrl := os.Getenv("SMTP_HONEYPOT_AXIOM_URL")
+	if axiomUrl == "" {
+		return fmt.Errorf("SMTP_HONEYPOT_AXIOM_URL not set")
+	}
+
+	axiomToken := os.Getenv("SMTP_HONEYPOT_AXIOM_TOKEN")
+	if axiomToken == "" {
+		return fmt.Errorf("SMTP_HONEYPOT_AXIOM_TOKEN not set")
+	}
+
+	data, err := json.Marshal(connection)
+	if err != nil {
+		return fmt.Errorf("error marshalling transaction: %s\n", err.Error())
+	}
+
+	req, err := http.NewRequest("POST", axiomUrl, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("content-type", "application/json")
+	req.Header.Add("authorization", "Bearer xaat-8bfa0c1a-67f6-44db-a21c-77337a636c88")
+
+	_, err = http.DefaultClient.Do(req)
+	return err
 }

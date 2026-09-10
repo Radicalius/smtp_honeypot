@@ -49,7 +49,16 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 		conn.Close()
 		logger.Close()
 		connection.DurationMs = uint64(time.Now().UnixMilli()) - connection.StartEpochMs
-		connLogger.WriteTransaction(connection)
+
+		err = connLogger.WriteTransaction(connection)
+		if err != nil {
+			fmt.Printf("error logging connection data: %s\n", err.Error())
+		}
+
+		err = connLogger.PublishAxiomTransaction(connection)
+		if err != nil {
+			fmt.Printf("error sending to axiom: %s\n", err.Error())
+		}
 
 		<-handlerSemaphor
 	}()
