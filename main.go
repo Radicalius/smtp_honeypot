@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"smtp_honeypot/protocol"
+	"strconv"
 	"strings"
 	"time"
 
@@ -40,9 +41,26 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 
 	connection := protocol.SmtpConnection{
 		Guid:         id,
-		SrcAddr:      conn.RemoteAddr().String(),
-		DstAddr:      conn.LocalAddr().String(),
 		StartEpochMs: uint64(time.Now().UnixMilli()),
+	}
+
+	if hostName, err := os.Hostname(); err == nil {
+		connection.HoneypotName = hostName
+	}
+
+	srcAddrParts := strings.Split(conn.RemoteAddr().String(), ":")
+	if len(srcAddrParts) == 2 {
+		connection.SrcAddr = srcAddrParts[0]
+		if port, err := strconv.ParseInt(srcAddrParts[1], 10, 64); err == nil {
+			connection.SrcPort = int(port)
+		}
+	}
+
+	dstAddrParts := strings.Split(conn.LocalAddr().String(), ":")
+	if len(dstAddrParts) == 2 {
+		if port, err := strconv.ParseInt(dstAddrParts[1], 10, 64); err == nil {
+			connection.DstPort = int(port)
+		}
 	}
 
 	defer func() {
