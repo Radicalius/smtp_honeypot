@@ -32,7 +32,7 @@ func (b *BufferedTLSConn) TLSCheck() (bool, error) {
 }
 
 func (b *BufferedTLSConn) Read(p []byte) (n int, err error) {
-	if b.byteBuffer != nil {
+	if b.byteBuffer != nil && b.byteBuffer[0] != 0 {
 		p[0] = b.byteBuffer[0]
 		n, err := b.conn.Read(p[1:])
 		if err != nil {
