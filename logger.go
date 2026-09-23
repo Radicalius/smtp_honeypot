@@ -120,15 +120,15 @@ func (t *ConnectionLogger) WriteTransaction(connection protocol.SmtpConnection) 
 	return nil
 }
 
-func (c *ConnectionLogger) PublishAxiomTransaction(connection protocol.SmtpConnection) error {
-	axiomUrl := os.Getenv("SMTP_HONEYPOT_AXIOM_URL")
-	if axiomUrl == "" {
-		return fmt.Errorf("SMTP_HONEYPOT_AXIOM_URL not set")
+func (c *ConnectionLogger) PublishTransaction(connection protocol.SmtpConnection) error {
+	publishUrl := os.Getenv("SMTP_HONEYPOT_PUBLISH_URL")
+	if publishUrl == "" {
+		return fmt.Errorf("SMTP_HONEYPOT_PUBLISH_URL not set")
 	}
 
-	axiomToken := os.Getenv("SMTP_HONEYPOT_AXIOM_TOKEN")
-	if axiomToken == "" {
-		return fmt.Errorf("SMTP_HONEYPOT_AXIOM_TOKEN not set")
+	publishToken := os.Getenv("SMTP_HONEYPOT_PUBLISH_TOKEN")
+	if publishToken == "" {
+		return fmt.Errorf("SMTP_HONEYPOT_PUBLISH_TOKEN not set")
 	}
 
 	data, err := json.Marshal(connection)
@@ -136,13 +136,13 @@ func (c *ConnectionLogger) PublishAxiomTransaction(connection protocol.SmtpConne
 		return fmt.Errorf("error marshalling transaction: %s\n", err.Error())
 	}
 
-	req, err := http.NewRequest("POST", axiomUrl, bytes.NewReader(data))
+	req, err := http.NewRequest("POST", publishUrl, bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
 
 	req.Header.Add("content-type", "application/json")
-	req.Header.Add("authorization", "Bearer xaat-8bfa0c1a-67f6-44db-a21c-77337a636c88")
+	req.Header.Add("x-api-key", publishToken)
 
 	_, err = http.DefaultClient.Do(req)
 	return err

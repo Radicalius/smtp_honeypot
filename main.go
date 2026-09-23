@@ -73,7 +73,7 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 			fmt.Printf("error logging connection data: %s\n", err.Error())
 		}
 
-		err = connLogger.PublishAxiomTransaction(connection)
+		err = connLogger.PublishTransaction(connection)
 		if err != nil {
 			fmt.Printf("error sending to axiom: %s\n", err.Error())
 		}
