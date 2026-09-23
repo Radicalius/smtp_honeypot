@@ -1,0 +1,7 @@
+printf "MGLNDD test\r\nQUIT\r\n" | nc localhost 2525
+
+220 mx01.example.net ESMTP
+500 5.5.1 Command unrecognized
+221 2.0.0 Bye
+
+{}
