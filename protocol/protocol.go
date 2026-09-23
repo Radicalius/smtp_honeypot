@@ -120,6 +120,7 @@ var smtpMessages []SmtpMessage = []SmtpMessage{
 	SmtpDataMessage{},
 	SmtpAuthLoginMessage{},
 	SmtpAuthPlainMessage{},
+	SmtpAuthInvalidMessage{},
 	SmtpVrfyMessage{},
 	SmtpEtrnMessage{},
 	SmtpRsetMessage{},
@@ -137,5 +138,5 @@ func Handle(connection *SmtpConnection, body []byte) string {
 		}
 	}
 
-	return "503 5.5.1 Bad sequence"
+	return "500 5.5.1 Command unrecognized"
 }
