@@ -40,8 +40,9 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 	}
 
 	connection := protocol.SmtpConnection{
-		Guid:         id,
-		StartEpochMs: uint64(time.Now().UnixMilli()),
+		Guid:            id,
+		StartEpochMs:    uint64(time.Now().UnixMilli()),
+		HoneypotVersion: Version,
 	}
 
 	if hostName, err := os.Hostname(); err == nil {
