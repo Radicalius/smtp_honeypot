@@ -77,6 +77,7 @@ type SmtpConnection struct {
 	SrcPort          int                  `json:"srcPort"`
 	DstPort          int                  `json:"DstPort"`
 	HoneypotName     string               `json:"honeypotName"`
+	HoneypotVersion  string               `json:"honeypotVersion"`
 	Hostname         string               `json:"hostname"`
 	Transactions     []SmtpTransaction    `json:"transactions"`
 	Authentication   []SmtpAuthentication `json:"authentication"`
