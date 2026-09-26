@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"crypto/tls"
 	"net"
+	"os"
 	"smtp_honeypot/protocol"
+	"strconv"
 	"time"
 )
 
@@ -21,9 +23,16 @@ func NewBufferedTLSConn(conn net.Conn) *BufferedTLSConn {
 }
 
 func (b *BufferedTLSConn) TLSCheck() (bool, error) {
+	var err error
+	var immTlsWindow int64
+	if immTlsWindow, err = strconv.ParseInt(os.Getenv("SMTP_HONEYPOT_IMMEDIATE_TLS_WINDOW"), 10, 64); err != nil {
+		immTlsWindow = 100
+	}
+
+	b.conn.SetReadDeadline(time.Now().Add(time.Duration(immTlsWindow) * time.Millisecond))
+
 	b.byteBuffer = make([]byte, 1)
-	b.conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
-	_, err := b.conn.Read(b.byteBuffer)
+	_, err = b.conn.Read(b.byteBuffer)
 	if err != nil {
 		return false, err
 	}
