@@ -1,0 +1,9 @@
+{
+  "immediateTlsWindow": {
+    "default": 100
+    // "rollout": {
+    //   "value": 250,
+    //   "percentage": 50
+    // }
+  }
+}
