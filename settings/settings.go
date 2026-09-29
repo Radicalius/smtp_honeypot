@@ -31,8 +31,18 @@ func (v *VarConfig[T]) GetValue(ip string) T {
 	return v.Default
 }
 
+type EvaluatedSettings struct {
+	ImmediateTlsWindow int
+}
+
 type Settings struct {
 	ImmediateTlsWindow VarConfig[int] `json:"immediateTlsWindow"`
+}
+
+func (s *Settings) ToEvaluatedSettings(ip string) *EvaluatedSettings {
+	return &EvaluatedSettings{
+		ImmediateTlsWindow: s.ImmediateTlsWindow.GetValue(ip),
+	}
 }
 
 func GetSettings() *Settings {

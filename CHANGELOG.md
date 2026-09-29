@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Version 1.2.1
+- Added `settings` field to the honeypot logs. Contains the setting values used during the connection.
+
 ## Version 1,2,0
 - Added settings file which allows for partial rollouts of settings values
 - Upgraded to golang 1.27.0

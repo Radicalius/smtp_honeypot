@@ -3,6 +3,7 @@ package protocol
 import (
 	"crypto/tls"
 	"fmt"
+	"smtp_honeypot/settings"
 )
 
 var Identity string = "mx01.example.net"
@@ -90,6 +91,8 @@ type SmtpConnection struct {
 	EtrnNode         string               `json:"etrnNode"`
 	StartEpochMs     uint64               `json:"startEpochMs"`
 	DurationMs       uint64               `json:"durationMs"`
+
+	EvaluatedSettings *settings.EvaluatedSettings `json:"settings"`
 
 	Deferred SmtpMessage `json:"-"`
 }

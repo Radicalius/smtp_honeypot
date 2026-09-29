@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"smtp_honeypot/protocol"
+	"smtp_honeypot/settings"
 	"strconv"
 	"strings"
 	"time"
@@ -56,6 +57,8 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 			connection.SrcPort = int(port)
 		}
 	}
+
+	connection.EvaluatedSettings = settings.GetSettings().ToEvaluatedSettings(connection.SrcAddr)
 
 	dstAddrParts := strings.Split(conn.LocalAddr().String(), ":")
 	if len(dstAddrParts) == 2 {
