@@ -13,15 +13,16 @@ var settingsFile []byte
 type VarConfig[T any] struct {
 	Default T `json:"default"`
 	Rollout *struct {
-		Value      T   `json:"value"`
-		Percentage int `json:"percentage"`
+		Value      T      `json:"value"`
+		Percentage int    `json:"percentage"`
+		Key        string `json:"key"`
 	} `json:"rollout"`
 }
 
 func (v *VarConfig[T]) GetValue(ip string) T {
 	if v.Rollout != nil {
 		h := fnv.New32a()
-		h.Write([]byte(ip))
+		h.Write([]byte(v.Rollout.Key + "|" + ip))
 		hashInt := h.Sum32()
 		if hashInt%100 < uint32(v.Rollout.Percentage) {
 			return v.Rollout.Value
@@ -32,16 +33,19 @@ func (v *VarConfig[T]) GetValue(ip string) T {
 }
 
 type EvaluatedSettings struct {
-	ImmediateTlsWindow int
+	ImmediateTlsWindow       int
+	AuthRetriesBeforeSuccess int
 }
 
 type Settings struct {
-	ImmediateTlsWindow VarConfig[int] `json:"immediateTlsWindow"`
+	ImmediateTlsWindow       VarConfig[int] `json:"immediateTlsWindow"`
+	AuthRetriesBeforeSuccess VarConfig[int] `json:"authRetriesBeforeSuccess"`
 }
 
 func (s *Settings) ToEvaluatedSettings(ip string) *EvaluatedSettings {
 	return &EvaluatedSettings{
-		ImmediateTlsWindow: s.ImmediateTlsWindow.GetValue(ip),
+		ImmediateTlsWindow:       s.ImmediateTlsWindow.GetValue(ip),
+		AuthRetriesBeforeSuccess: s.ImmediateTlsWindow.GetValue(ip),
 	}
 }
 

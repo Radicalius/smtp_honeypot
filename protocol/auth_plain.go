@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"regexp"
+	"smtp_honeypot/settings"
 )
 
 var authPlainRegex = regexp.MustCompile("(?i)AUTH PLAIN (.*)")
@@ -39,6 +40,11 @@ func (s SmtpAuthPlainMessage) Handle(connection *SmtpConnection, arg []byte) str
 	}
 
 	connection.Authentication = append(connection.Authentication, auth)
+
+	connection.AuthAttempt += 1
+	if connection.AuthAttempt < settings.GetSettings().AuthRetriesBeforeSuccess.GetValue(connection.SrcAddr) {
+		return "535 5.7.8 Authentication credentials invalid"
+	}
 
 	return "235 2.7.0 Authentication successful"
 }

@@ -3,6 +3,7 @@ package protocol
 import (
 	"encoding/base64"
 	"regexp"
+	"smtp_honeypot/settings"
 )
 
 var authLoginRegex = regexp.MustCompile(`(?i)^AUTH LOGIN(?:\s+(\S+))?$`)
@@ -50,6 +51,11 @@ func (s SmtpAuthLoginMessage) Handle(connection *SmtpConnection, arg []byte) str
 	decoded, err := base64.StdEncoding.DecodeString(string(arg))
 	if err == nil {
 		lastAuth.Password = string(decoded)
+	}
+
+	connection.AuthAttempt += 1
+	if connection.AuthAttempt < settings.GetSettings().AuthRetriesBeforeSuccess.GetValue(connection.SrcAddr) {
+		return "535 5.7.8 Authentication credentials invalid"
 	}
 
 	connection.Deferred = nil

@@ -94,7 +94,8 @@ type SmtpConnection struct {
 
 	EvaluatedSettings *settings.EvaluatedSettings `json:"settings"`
 
-	Deferred SmtpMessage `json:"-"`
+	Deferred    SmtpMessage `json:"-"`
+	AuthAttempt int         `json:"-"`
 }
 
 func (s *SmtpConnection) GetCurrentTransaction(createNewIfComplete bool) *SmtpTransaction {

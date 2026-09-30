@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Version 1.3.0
+- Reject the first few authentication attempts to encourage bots to provide more credentials. The number of attempts before auth is accepted is controlled via `authRetriesBeforeSuccess`
+
 ## Version 1.2.1
 - Added `settings` field to the honeypot logs. Contains the setting values used during the connection.
 

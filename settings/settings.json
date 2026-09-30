@@ -5,5 +5,13 @@
     //   "value": 250,
     //   "percentage": 50
     // }
+  },
+  "authRetriesBeforeSuccess": {
+    "default": 0
+    // "rollout": {
+    //   "value": 3,
+    //   "percentage": 50,
+    //   "key": "auth"
+    // }
   }
 }
