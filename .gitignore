@@ -3,3 +3,5 @@ smtp_honeypot
 *.crt
 *.pem
 data/
+__pycache__/
+.pytest_cache/
