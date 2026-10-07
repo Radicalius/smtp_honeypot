@@ -1,17 +1,8 @@
 {
   "immediateTlsWindow": {
-    "default": 100
-    // "rollout": {
-    //   "value": 250,
-    //   "percentage": 50
-    // }
+    "default": 250
   },
   "authRetriesBeforeSuccess": {
     "default": 0
-    // "rollout": {
-    //   "value": 3,
-    //   "percentage": 50,
-    //   "key": "auth"
-    // }
   }
 }

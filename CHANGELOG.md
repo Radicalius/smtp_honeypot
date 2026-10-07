@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Version 1.3.1
+- Fix a bug where the `authRetriesBeforeSuccess` setting output in logs was accidentally set to the value of immediateTlsWindow.
+- Fix JSON format in settings.json by removing comments.
+- Use native uuid library instead of importing google's
+
 ## Version 1.3.0
 - Reject the first few authentication attempts to encourage bots to provide more credentials. The number of attempts before auth is accepted is controlled via `authRetriesBeforeSuccess`
 

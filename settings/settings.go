@@ -45,7 +45,7 @@ type Settings struct {
 func (s *Settings) ToEvaluatedSettings(ip string) *EvaluatedSettings {
 	return &EvaluatedSettings{
 		ImmediateTlsWindow:       s.ImmediateTlsWindow.GetValue(ip),
-		AuthRetriesBeforeSuccess: s.ImmediateTlsWindow.GetValue(ip),
+		AuthRetriesBeforeSuccess: s.AuthRetriesBeforeSuccess.GetValue(ip),
 	}
 }
 

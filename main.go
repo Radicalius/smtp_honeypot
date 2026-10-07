@@ -14,8 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/google/uuid"
+	"uuid"
 )
 
 var tlsConfig *tls.Config
