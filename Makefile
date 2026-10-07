@@ -1,4 +1,5 @@
 SERVER_IP=""
+PYTHON ?= python3
 
 deploy: build upload restart
 
@@ -11,11 +12,15 @@ clean-data:
 	rm -f data/sessions/*
 	rm -f data/transactions/*
 
-test: build clean-data
-	-pkill -f smtp_honeypot
-	SMTP_HONEYPOT_LOG_ROOT=./data ./smtp_honeypot &
-	cd tests && python3 runner.py
-	-pkill -f smtp_honeypot
+test: build
+	@set -eu; \
+		test_data=$$(mktemp -d); \
+		mkdir -p "$$test_data/sessions" "$$test_data/transactions"; \
+		export SMTP_HONEYPOT_LOG_ROOT="$$test_data"; \
+		./smtp_honeypot & server_pid=$$!; \
+		trap 'kill "$$server_pid" 2>/dev/null || true; wait "$$server_pid" 2>/dev/null || true; rm -rf "$$test_data"' EXIT; \
+		cd tests; \
+		$(PYTHON) -m pytest -q
 
 upload:
 	scp -i smtp_honeypot.pem smtp_honeypot "ubuntu@$(SERVER_IP):~/"

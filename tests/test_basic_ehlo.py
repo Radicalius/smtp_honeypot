@@ -1,0 +1,60 @@
+from smtp_test_runner import run_smtp_test
+
+
+def test_basic_ehlo():
+    run_smtp_test(
+        command=r'''swaks --server localhost --port 2525 \
+  --to recipient@test.com --from recipient@test.com \
+  --h-Date: "Thu, 01 Jan 2020 00:00:00 +0000" \
+  --h-Subject: "test" \
+  --h-Message-Id: "<fixed@test>" \
+  --ehlo fixed.host''',
+        expected_output='''<-  220 mx01.example.net ESMTP
+ -> EHLO fixed.host
+<-  250-mx01.example.net
+<-  250-PIPELINING
+<-  250-SIZE 10240000
+<-  250-VRFY
+<-  250-ETRN
+<-  250-STARTTLS
+<-  250-AUTH LOGIN PLAIN
+<-  250 8BITMIME
+ -> MAIL FROM:<recipient@test.com>
+<-  250 2.1.0 OK
+ -> RCPT TO:<recipient@test.com>
+<-  250 2.1.5 OK
+ -> DATA
+<-  354 3.0.0 Start mail input
+ -> Date: Thu, 01 Jan 2020 00:00:00 +0000
+ -> To: recipient@test.com
+ -> From: recipient@test.com
+ -> Subject: test
+ -> Message-Id: <fixed@test>
+ -> X-Mailer: swaks v20240103.0 jetmore.org/john/code/swaks/
+ -> 
+ -> This is a test mailing
+ -> 
+ -> 
+ -> .
+<-  250 2.0.0 OK
+ -> QUIT
+<-  221 2.0.0 Bye''',
+        expected_log={
+            "hostname": "fixed.host",
+            "transactions": [
+                {
+                    "status": 2,
+                    "from": ["recipient@test.com"],
+                    "to": ["recipient@test.com"],
+                    "data": "RGF0ZTogVGh1LCAwMSBKYW4gMjAyMCAwMDowMDowMCArMDAwMFRvOiByZWNpcGllbnRAdGVzdC5jb21Gcm9tOiByZWNpcGllbnRAdGVzdC5jb21TdWJqZWN0OiB0ZXN0TWVzc2FnZS1JZDogPGZpeGVkQHRlc3Q+WC1NYWlsZXI6IHN3YWtzIHYyMDI0MDEwMy4wIGpldG1vcmUub3JnL2pvaG4vY29kZS9zd2Frcy9UaGlzIGlzIGEgdGVzdCBtYWlsaW5n",
+                }
+            ],
+            "authentication": None,
+            "verifiedAddrs": None,
+            "tls": False,
+            "tlsInfo": None,
+            "extended": True,
+            "etrn": False,
+            "etrnNode": "",
+        },
+    )
