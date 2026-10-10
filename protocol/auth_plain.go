@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/base64"
 	"fmt"
@@ -17,7 +18,7 @@ func (s SmtpAuthPlainMessage) Matches(arg []byte) bool {
 	return authPlainRegex.Match(arg)
 }
 
-func (s SmtpAuthPlainMessage) Handle(connection *SmtpConnection, arg []byte) string {
+func (s SmtpAuthPlainMessage) Handle(connection *SmtpConnection, arg []byte, _ *bufio.Reader) string {
 	matches := authPlainRegex.FindSubmatch(arg)
 
 	auth := SmtpAuthentication{

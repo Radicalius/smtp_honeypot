@@ -129,7 +129,7 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 			continue
 		}
 
-		resp := protocol.Handle(&connection, command)
+		resp := protocol.Handle(&connection, command, reader)
 
 		if resp != "" {
 			_sendMessageWithLog(conn, logger, []byte(resp+"\r\n"))

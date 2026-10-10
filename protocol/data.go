@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bufio"
 	"encoding/base64"
 	"strings"
 )
@@ -11,7 +12,7 @@ func (s SmtpDataMessage) Matches(message []byte) bool {
 	return strings.ToUpper(string(message)) == "DATA"
 }
 
-func (s SmtpDataMessage) Handle(connection *SmtpConnection, message []byte) string {
+func (s SmtpDataMessage) Handle(connection *SmtpConnection, message []byte, _ *bufio.Reader) string {
 	if s.Matches(message) {
 		connection.Deferred = s
 		return "354 3.0.0 Start mail input"

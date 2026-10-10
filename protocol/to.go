@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bufio"
 	"fmt"
 	"regexp"
 )
@@ -14,7 +15,7 @@ func (s SmtpToMessage) Matches(arg []byte) bool {
 	return toRegex.Match(arg)
 }
 
-func (s SmtpToMessage) Handle(connection *SmtpConnection, arg []byte) string {
+func (s SmtpToMessage) Handle(connection *SmtpConnection, arg []byte, _ *bufio.Reader) string {
 	matches := toRegex.FindSubmatch(arg)
 	lastTrans := connection.GetCurrentTransaction(true)
 	if len(matches) < 2 {

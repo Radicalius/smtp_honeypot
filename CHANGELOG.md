@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Version 1.3.2
+- Fix the Pipelined Authentication Read Buffer Carryover bug by clearing the read buffer upon recieving an invalid auth method.
+
 ## Version 1.3.1
 - Fix a bug where the `authRetriesBeforeSuccess` setting output in logs was accidentally set to the value of immediateTlsWindow.
 - Fix JSON format in settings.json by removing comments.

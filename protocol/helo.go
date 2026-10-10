@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bufio"
 	"regexp"
 )
 
@@ -12,7 +13,7 @@ func (s SmtpHeloMessage) Matches(arg []byte) bool {
 	return heloRegex.Match(arg)
 }
 
-func (s SmtpHeloMessage) Handle(connection *SmtpConnection, arg []byte) string {
+func (s SmtpHeloMessage) Handle(connection *SmtpConnection, arg []byte, _ *bufio.Reader) string {
 	matches := heloRegex.FindSubmatch(arg)
 	if len(matches) >= 4 {
 		connection.Hostname = string(matches[3])

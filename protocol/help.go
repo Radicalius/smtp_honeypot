@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bufio"
 	"regexp"
 	"strings"
 )
@@ -13,7 +14,7 @@ func (s SmtpHelpMessage) Matches(arg []byte) bool {
 	return helpRegex.Match(arg)
 }
 
-func (s SmtpHelpMessage) Handle(connection *SmtpConnection, arg []byte) string {
+func (s SmtpHelpMessage) Handle(connection *SmtpConnection, arg []byte, _ *bufio.Reader) string {
 	matches := helpRegex.FindSubmatch(arg)
 	if len(matches) >= 4 && len(matches[3]) > 0 {
 		return "214 Help entry for " + string(matches[3])

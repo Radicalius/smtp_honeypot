@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bufio"
 	"fmt"
 	"regexp"
 )
@@ -14,7 +15,7 @@ func (s SmtpEtrnMessage) Matches(arg []byte) bool {
 	return etrnRegex.Match(arg)
 }
 
-func (s SmtpEtrnMessage) Handle(connection *SmtpConnection, arg []byte) string {
+func (s SmtpEtrnMessage) Handle(connection *SmtpConnection, arg []byte, _ *bufio.Reader) string {
 	connection.EtrnEnabled = true
 
 	matches := etrnRegex.FindSubmatch(arg)

@@ -22,6 +22,10 @@ test: build
 		cd tests; \
 		$(PYTHON) -m pytest -q
 
+run:
+	export SMTP_HONEYPOT_LOG_ROOT="./data"; \
+	./smtp_honeypot
+
 upload:
 	scp -i smtp_honeypot.pem smtp_honeypot "ubuntu@$(SERVER_IP):~/"
 	ssh -i smtp_honeypot.pem "ubuntu@$(SERVER_IP)" sudo mv smtp_honeypot /usr/local/bin

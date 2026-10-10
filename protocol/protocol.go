@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bufio"
 	"crypto/tls"
 	"fmt"
 	"smtp_honeypot/settings"
@@ -114,7 +115,7 @@ func (s *SmtpConnection) GetCurrentTransaction(createNewIfComplete bool) *SmtpTr
 
 type SmtpMessage interface {
 	Matches([]byte) bool
-	Handle(*SmtpConnection, []byte) string
+	Handle(*SmtpConnection, []byte, *bufio.Reader) string
 }
 
 var smtpMessages []SmtpMessage = []SmtpMessage{
@@ -132,14 +133,14 @@ var smtpMessages []SmtpMessage = []SmtpMessage{
 	SmtpHelpMessage{},
 }
 
-func Handle(connection *SmtpConnection, body []byte) string {
+func Handle(connection *SmtpConnection, body []byte, reader *bufio.Reader) string {
 	if connection.Deferred != nil {
-		return connection.Deferred.Handle(connection, body)
+		return connection.Deferred.Handle(connection, body, reader)
 	}
 
 	for _, message := range smtpMessages {
 		if message.Matches(body) {
-			return message.Handle(connection, body)
+			return message.Handle(connection, body, reader)
 		}
 	}
 

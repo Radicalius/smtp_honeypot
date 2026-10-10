@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bufio"
 	"encoding/base64"
 	"regexp"
 	"smtp_honeypot/settings"
@@ -15,7 +16,7 @@ func (s SmtpAuthLoginMessage) Matches(arg []byte) bool {
 	return authLoginRegex.Match(arg)
 }
 
-func (s SmtpAuthLoginMessage) Handle(connection *SmtpConnection, arg []byte) string {
+func (s SmtpAuthLoginMessage) Handle(connection *SmtpConnection, arg []byte, _ *bufio.Reader) string {
 	matches := authLoginRegex.FindSubmatch(arg)
 	if len(matches) > 0 {
 		auth := SmtpAuthentication{Type: "LOGIN"}
