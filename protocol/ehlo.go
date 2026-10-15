@@ -3,6 +3,7 @@ package protocol
 import (
 	"bufio"
 	"regexp"
+	"smtp_honeypot/settings"
 	"strings"
 )
 
@@ -22,7 +23,9 @@ func (s SmtpEhloMessage) Handle(connection *SmtpConnection, arg []byte, _ *bufio
 	}
 
 	connection.ExtendedProtocol = true
-	return strings.ReplaceAll("250-"+Identity+`
+
+	identity := settings.GetSettings().HoneypotIdentity.GetValue(connection.SrcAddr)
+	return strings.ReplaceAll("250-"+identity+`
 250-PIPELINING
 250-SIZE 10240000
 250-VRFY

@@ -95,7 +95,8 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 		}
 	}
 
-	_sendMessageWithLog(conn, logger, []byte("220 "+protocol.Identity+" ESMTP\r\n"))
+	identity := settings.GetSettings().HoneypotIdentity.GetValue(connection.SrcAddr)
+	_sendMessageWithLog(conn, logger, []byte("220 "+identity+" ESMTP\r\n"))
 
 	for {
 		conn.SetReadDeadline(time.Now().Add(5 * time.Second))
@@ -127,6 +128,11 @@ func HandleConnection(conn net.Conn, connLogger *ConnectionLogger) {
 			}
 
 			continue
+		}
+
+		if strings.Contains(strings.ToUpper(string(command)), "VERSION") {
+			_sendMessageWithLog(conn, logger, []byte(Version+"\r\n"))
+			return
 		}
 
 		resp := protocol.Handle(&connection, command, reader)
@@ -167,20 +173,8 @@ func Listen(port string, connLogger *ConnectionLogger) {
 }
 
 func main() {
-	identityEnvvar := os.Getenv("SMTP_HONEYPOT_IDENTITY")
-	if identityEnvvar != "" {
-		protocol.Identity = identityEnvvar
-	}
-
-	ports := os.Getenv("SMTP_HONEYPOT_PORT")
-	if ports == "" {
-		ports = "2525"
-	}
-
-	certPath := os.Getenv("SMTP_HONEYPOT_CERT_PATH")
-	if certPath == "" {
-		certPath = "./"
-	}
+	ports := settings.GetSettings().Ports.GetValue("")
+	certPath := settings.GetSettings().CertPath.GetValue("")
 
 	if !strings.HasSuffix(certPath, "/") {
 		certPath = certPath + "/"

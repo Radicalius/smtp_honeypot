@@ -9,10 +9,12 @@ import (
 	"net/http"
 	"os"
 	"smtp_honeypot/protocol"
+	"smtp_honeypot/settings"
+	"strings"
 	"time"
 )
 
-var logRootPath = os.Getenv("SMTP_HONEYPOT_LOG_ROOT")
+var logRootPath = settings.GetSettings().LogRoot.GetValue("")
 
 const (
 	MESSAGE_DIRECTION_CLIENT_TO_SERVER uint8 = 1
@@ -121,12 +123,17 @@ func (t *ConnectionLogger) WriteTransaction(connection protocol.SmtpConnection) 
 }
 
 func (c *ConnectionLogger) PublishTransaction(connection protocol.SmtpConnection) error {
-	publishUrl := os.Getenv("SMTP_HONEYPOT_PUBLISH_URL")
+	operatorWhitelist := settings.GetSettings().OperatorIpWhitelist.GetValue("")
+	if connection.Hostname == "healthcheck" || strings.Contains(operatorWhitelist, connection.SrcAddr) {
+		return nil
+	}
+
+	publishUrl := settings.GetSettings().PublishUrl.GetValue(connection.SrcAddr)
 	if publishUrl == "" {
 		return fmt.Errorf("SMTP_HONEYPOT_PUBLISH_URL not set")
 	}
 
-	publishToken := os.Getenv("SMTP_HONEYPOT_PUBLISH_TOKEN")
+	publishToken := settings.GetSettings().PublishToken.GetValue(connection.SrcAddr)
 	if publishToken == "" {
 		return fmt.Errorf("SMTP_HONEYPOT_PUBLISH_TOKEN not set")
 	}

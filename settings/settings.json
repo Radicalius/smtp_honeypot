@@ -1,4 +1,32 @@
 {
+  "logRoot": {
+    "default": "./data",
+    "envvar": "SMTP_HONEYPOT_LOG_ROOT"
+  },
+  "publishUrl": {
+    "default": "",
+    "envvar": "SMTP_HONEYPOT_PUBLISH_URL"
+  },
+  "publishToken": {
+    "default": "",
+    "envvar": "SMTP_HONEYPOT_PUBLISH_TOKEN"
+  },
+  "ports": {
+    "default": "2525",
+    "envvar": "SMTP_HONEYPOT_PORT"
+  },
+  "certPath": {
+    "default": "./",
+    "envvar": "SMTP_HONEYPOT_CERT_PATH"
+  },
+  "operatorIpWhitelist": {
+    "default": "",
+    "envvar": "SMTP_HONEYPOT_OPERATOR_IP_WHITELIST"
+  },
+  "honeypotIdentity": {
+    "default": "mx01.example.net",
+    "envvar": "SMTP_HONEYPOT_IDENTITY"
+  },
   "immediateTlsWindow": {
     "default": 250
   },

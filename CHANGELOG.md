@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Version 1.4.0
+- VERSION command to check currently deployed version
+- OperatorIpWhitelist setting to ensure testing traffic is not logged
+- All settings are read from settings.json and overridden using envvars
+
 ## Version 1.3.2
 - Fix the Pipelined Authentication Read Buffer Carryover bug by clearing the read buffer upon recieving an invalid auth method.
 
